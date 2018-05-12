@@ -26,12 +26,17 @@ cant_repeticiones = 100000
 multiplicidad = 0
 mejor_caso = 0
 data = []
+# para cada valor que puede tomar la variable de decision
 for j in grado_de_multiplicidad:
     ganancias = []
+    # Simulo k repeticiones de la simulacion
     for k in range(0, cant_repeticiones):
         ganancia = 0
+        # Para cada uno de los tipos de casas
         for i in range(0, len(variaciones)):
+            #Instancio la variable aleatoria
             precio_variado = variaciones[i]()
+            #Calculo la ganancia de esa corrida
             precio_total = precios[i] * (1 + precio_variado/100)
             variacion_demanda = reacciones[i] * (-precio_variado) / 100 + 1
             demanda_total = demandas[i] * variacion_demanda
@@ -39,19 +44,23 @@ for j in grado_de_multiplicidad:
             habitaciones_alquiladas = min(demanda_total, habitaciones_construidas)
             ganancia += habitaciones_alquiladas * precio_total
         ganancias.append(ganancia)
+    # Calculo media y varianza de las corridas
     p = np.mean(ganancias)
     v = np.var(ganancias)
     data.append([str(p), str(v), str(j)])
+    # Me quedo con la mejor ganancia y multiplicidad
     if mejor_caso < p:
         mejor_caso = p
         multiplicidad = j
 
+# Guardo los datos en un csv
 with open('data-bounded.csv', 'w', newline='') as csvfile:
     spamwriter = csv.writer(csvfile, delimiter=';',
                             quotechar='|', quoting=csv.QUOTE_MINIMAL)
     for row in data:
         spamwriter.writerow(row)
-    
+
+# imporimo la mejor solucion
 print("%d Economico, %d Negocios, %d Ejecutiva, %d Premium,  %f Ganancia" %
     ( multiplicidad * proporciones[0], multiplicidad * proporciones[1], multiplicidad * proporciones[2], multiplicidad * proporciones[3] , mejor_caso))
 
